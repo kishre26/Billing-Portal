@@ -1,6 +1,7 @@
 import { can, Role, ROLES } from "@/lib/rbac";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { CheckoutButton } from "./CheckoutButton";
 
 export default async function PlansPage() {
   const store = await cookies();
@@ -13,11 +14,16 @@ export default async function PlansPage() {
 
   const canChange = can(CURRENT_ROLE, "change_plan");
 
-  // ✅ Reading from real database now!
   const plans = await db.plan.findMany({
     where: { isActive: true },
     orderBy: { price: "asc" },
   });
+
+  const priceIds: Record<string, string> = {
+    Starter: process.env.STRIPE_STARTER_PRICE_ID!,
+    Growth: process.env.STRIPE_GROWTH_PRICE_ID!,
+    Scale: process.env.STRIPE_SCALE_PRICE_ID!,
+  };
 
   return (
     <div>
@@ -29,12 +35,9 @@ export default async function PlansPage() {
       <div style={{ display: "flex", gap: "20px" }}>
         {plans.map((plan, index) => (
           <div key={plan.id} style={{
-            flex: 1,
-            background: "#fff",
+            flex: 1, background: "#fff",
             border: index === 1 ? "2px solid #6366f1" : "1px solid #e2e8f0",
-            borderRadius: "10px",
-            padding: "24px",
-            position: "relative",
+            borderRadius: "10px", padding: "24px", position: "relative",
           }}>
             {index === 1 && (
               <div style={{
@@ -60,25 +63,15 @@ export default async function PlansPage() {
                 </li>
               ))}
             </ul>
-            <button
-              disabled={!canChange}
-              style={{
-                width: "100%", padding: "10px", borderRadius: "6px", border: "none",
-                background: canChange ? "#6366f1" : "#e2e8f0",
-                color: canChange ? "#fff" : "#94a3b8",
-                cursor: canChange ? "pointer" : "not-allowed",
-                fontSize: "14px", fontWeight: "500",
-              }}
-            >
-              {canChange ? `Select ${plan.name}` : "No permission to change plan"}
-            </button>
+
+            <CheckoutButton
+              priceId={priceIds[plan.name]}
+              planName={plan.name}
+              canChange={canChange}
+            />
           </div>
         ))}
       </div>
-
-      <p style={{ marginTop: "16px", fontSize: "12px", color: "#94a3b8" }}>
-        ✅ Plans loaded from real database
-      </p>
     </div>
   );
 }
