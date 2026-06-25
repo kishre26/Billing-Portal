@@ -1,6 +1,7 @@
 import { can, Role, ROLES } from "@/lib/rbac";
-import { INVOICES } from "@/lib/data";
 import { cookies } from "next/headers";
+import { getOrCreateUser } from "@/lib/user";
+import { db } from "@/lib/db";
 
 export default async function InvoicesPage() {
   const store = await cookies();
@@ -12,6 +13,13 @@ export default async function InvoicesPage() {
   }
 
   const canDownload = can(CURRENT_ROLE, "download_invoices");
+  const user = await getOrCreateUser();
+  if (!user) return <div style={deniedStyle}>Not logged in.</div>;
+
+  const invoices = await db.invoice.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <div>
@@ -41,7 +49,6 @@ export default async function InvoicesPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "#f1f5f9" }}>
-              <th style={thStyle}>Invoice ID</th>
               <th style={thStyle}>Description</th>
               <th style={thStyle}>Date</th>
               <th style={thStyle}>Amount</th>
@@ -49,11 +56,10 @@ export default async function InvoicesPage() {
             </tr>
           </thead>
           <tbody>
-            {INVOICES.map(inv => (
+            {invoices.map(inv => (
               <tr key={inv.id} style={{ borderTop: "1px solid #e2e8f0" }}>
-                <td style={tdStyle}>{inv.id}</td>
                 <td style={tdStyle}>{inv.description}</td>
-                <td style={tdStyle}>{inv.date}</td>
+                <td style={tdStyle}>{inv.createdAt.toLocaleDateString()}</td>
                 <td style={tdStyle}>${inv.amount}</td>
                 <td style={tdStyle}>
                   <span style={{
@@ -69,16 +75,13 @@ export default async function InvoicesPage() {
           </tbody>
         </table>
       </div>
+      <p style={{ marginTop: "12px", fontSize: "12px", color: "#94a3b8" }}>
+        ✅ {invoices.length} invoices loaded from real database
+      </p>
     </div>
   );
 }
 
-const thStyle: React.CSSProperties = {
-  padding: "12px 16px", fontSize: "13px", color: "#64748b", textAlign: "left", fontWeight: "600",
-};
-const tdStyle: React.CSSProperties = {
-  padding: "14px 16px", fontSize: "14px", color: "#334155",
-};
-const deniedStyle: React.CSSProperties = {
-  background: "#fee2e2", color: "#991b1b", padding: "20px", borderRadius: "8px",
-};
+const thStyle: React.CSSProperties = { padding: "12px 16px", fontSize: "13px", color: "#64748b", textAlign: "left", fontWeight: "600" };
+const tdStyle: React.CSSProperties = { padding: "14px 16px", fontSize: "14px", color: "#334155" };
+const deniedStyle: React.CSSProperties = { background: "#fee2e2", color: "#991b1b", padding: "20px", borderRadius: "8px" };

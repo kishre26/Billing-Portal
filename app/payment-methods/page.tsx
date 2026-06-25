@@ -1,6 +1,7 @@
 import { can, Role, ROLES } from "@/lib/rbac";
-import { PAYMENT_METHODS } from "@/lib/data";
 import { cookies } from "next/headers";
+import { getOrCreateUser } from "@/lib/user";
+import { db } from "@/lib/db";
 
 export default async function PaymentMethodsPage() {
   const store = await cookies();
@@ -12,6 +13,13 @@ export default async function PaymentMethodsPage() {
   }
 
   const canManage = can(CURRENT_ROLE, "manage_payment_methods");
+  const user = await getOrCreateUser();
+  if (!user) return <div style={deniedStyle}>Not logged in.</div>;
+
+  const paymentMethods = await db.paymentMethod.findMany({
+    where: { userId: user.id },
+    orderBy: { isDefault: "desc" },
+  });
 
   return (
     <div>
@@ -38,7 +46,7 @@ export default async function PaymentMethodsPage() {
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {PAYMENT_METHODS.map(pm => (
+        {paymentMethods.map(pm => (
           <div key={pm.id} style={{
             background: "#fff",
             border: pm.isDefault ? "2px solid #6366f1" : "1px solid #e2e8f0",
@@ -61,7 +69,8 @@ export default async function PaymentMethodsPage() {
               {pm.isDefault && (
                 <span style={{
                   background: "#ede9fe", color: "#6d28d9",
-                  fontSize: "11px", fontWeight: "600", padding: "2px 8px", borderRadius: "4px",
+                  fontSize: "11px", fontWeight: "600",
+                  padding: "2px 8px", borderRadius: "4px",
                 }}>
                   DEFAULT
                 </span>
@@ -69,8 +78,9 @@ export default async function PaymentMethodsPage() {
             </div>
             {canManage && !pm.isDefault && (
               <button style={{
-                background: "none", border: "1px solid #fca5a5", color: "#ef4444",
-                borderRadius: "6px", padding: "6px 12px", fontSize: "13px", cursor: "pointer",
+                background: "none", border: "1px solid #fca5a5",
+                color: "#ef4444", borderRadius: "6px",
+                padding: "6px 12px", fontSize: "13px", cursor: "pointer",
               }}>
                 Remove
               </button>
@@ -78,6 +88,9 @@ export default async function PaymentMethodsPage() {
           </div>
         ))}
       </div>
+      <p style={{ marginTop: "16px", fontSize: "12px", color: "#94a3b8" }}>
+        ✅ Payment methods loaded from real database
+      </p>
     </div>
   );
 }
