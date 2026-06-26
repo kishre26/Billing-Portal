@@ -70,7 +70,7 @@ export default async function DashboardPage() {
           {invoices.slice(0, 3).map(inv => (
             <tr key={inv.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
               <td style={tdStyle}>{inv.description}</td>
-              <td style={tdStyle}>{inv.createdAt.toLocaleDateString()}</td>
+              <td style={tdStyle}>{new Date(inv.createdAt).toISOString().split("T")[0]}</td>
               <td style={tdStyle}>${inv.amount}</td>
               <td style={tdStyle}>
                 <span style={{
