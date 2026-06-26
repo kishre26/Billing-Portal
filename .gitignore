@@ -47,3 +47,6 @@ stripe.exe
 
 # Prisma config
 prisma.config.ts
+
+AGENTS.md
+CLAUDE.md
