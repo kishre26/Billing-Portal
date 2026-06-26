@@ -83,26 +83,43 @@ Use Stripe test card: `4242 4242 4242 4242` (any future expiry, any CVC)
 billing-portal/ 
 
 ├── app/ 
+
 │   ├── api/ 
+
 │   │   ├── checkout/     # Stripe checkout endpoint 
+
 │   │   └── webhook/      # Stripe webhook handler 
+
 │   ├── invoices/         # Invoices page 
+
 │   ├── payment-methods/  # Payment methods page 
+
 │   ├── plans/            # Plans page with Stripe 
+
 │   ├── sign-in/          # Clerk sign in 
+
 │   ├── sign-up/          # Clerk sign up 
+
 │   └── team/             # Team & roles page 
 
 ├── components/ 
+
 │   ├── Header.tsx        # Header with role switcher 
+
 │   └── Sidebar.tsx       # Role-gated navigation 
 
 ├── lib/ 
+
 │   ├── auth.ts           # Session helper 
+
 │   ├── data.ts           # Mock data (fallback) 
+
 │   ├── db.ts             # Prisma client 
+
 │   ├── rbac.ts           # Roles & permissions 
+
 │   ├── stripe.ts         # Stripe client 
+
 │   └── user.ts           # User sync helper 
 
 └── prisma/ 
