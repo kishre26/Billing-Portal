@@ -126,8 +126,8 @@ billing-portal/
 
 └── schema.prisma     # Database schema
 
-## 🔗 Live Demo
-[billing-portal-dusky.vercel.app](https://billing-portal-dusky.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-billing--portal--dusky.vercel.app-6366f1?style=for-the-badge)](https://billing-portal-dusky.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-kishre26%2FBilling--Portal-181717?style=for-the-badge&logo=github)](https://github.com/kishre26/Billing-Portal)
 
 ## 📝 License
 MIT
