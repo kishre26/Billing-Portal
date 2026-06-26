@@ -50,7 +50,7 @@ export function Header({ role }: { role: Role }) {
         </div>
 
         {/* Clerk's UserButton — shows avatar, name, and sign out option */}
-        <UserButton afterSignOutUrl="/sign-in" />
+        <UserButton />
       </div>
     </header>
   );
